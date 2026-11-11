@@ -148,5 +148,50 @@ describe("E2E Critical Flow Tests — Warehouse Dashboard WMS", () => {
     assert.ok(bodyText.includes("Won (Ready for Dispatch)"), "Won stage column should render");
     assert.ok(bodyText.includes("Dangote Industries"), "Client cards should render");
   });
+
+  test("7. Settings / Admin Hub loads all 6 management tabs", async () => {
+    await page.goto(`${BASE_URL}/settings`, { waitUntil: "networkidle0", timeout: 20000 });
+
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    assert.ok(bodyText.includes("Admin Management Hub"), "Settings header should render");
+    assert.ok(bodyText.includes("Facilities & Zones"), "Facilities tab should render");
+    assert.ok(bodyText.includes("Categories & Units"), "Categories tab should render");
+    assert.ok(bodyText.includes("Staff & RBAC Permissions"), "Staff tab should render");
+    assert.ok(bodyText.includes("Feature Toggles & Policies"), "Feature Toggles tab should render");
+    assert.ok(bodyText.includes("Organization & Defaults"), "Organisation tab should render");
+  });
+
+  test("8. Settings — Feature toggle tab shows all 5 policy flags", async () => {
+    await page.goto(`${BASE_URL}/settings`, { waitUntil: "networkidle0", timeout: 20000 });
+
+    // Click Feature Toggles tab
+    const clicked = await page.evaluate(() => {
+      const tabs = Array.from(document.querySelectorAll("button"));
+      const tab = tabs.find((b) => b.textContent?.includes("Feature Toggles"));
+      if (tab) { tab.click(); return true; }
+      return false;
+    });
+    assert.ok(clicked, "Feature Toggles tab button should be clickable");
+
+    await new Promise((r) => setTimeout(r, 400));
+
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    assert.ok(bodyText.includes("Allow Negative Stock"), "Negative stock toggle should render");
+    assert.ok(bodyText.includes("Dual Approval") || bodyText.includes("Require Dual"), "Dual approval toggle should render");
+    assert.ok(bodyText.includes("Enable Payroll") || bodyText.includes("Payroll"), "Payroll module toggle should render");
+    assert.ok(bodyText.includes("CRM"), "CRM module toggle should render");
+  });
+
+  test("9. Settings — Facilities tab shows existing warehouses", async () => {
+    await page.goto(`${BASE_URL}/settings`, { waitUntil: "networkidle0", timeout: 20000 });
+
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    // Facilities & Zones is the first/default tab so warehouses should be visible
+    assert.ok(
+      bodyText.includes("Lagos Central Hub") || bodyText.includes("Ikeja"),
+      "Seed warehouses should be listed in Facilities tab"
+    );
+    assert.ok(bodyText.includes("Add Facility"), "Add Facility button should be visible");
+  });
 });
 

@@ -135,18 +135,55 @@ interface WarehouseContextType {
 
 const WarehouseContext = createContext<WarehouseContextType | undefined>(undefined);
 
+// --- localStorage helpers (safe SSR) ---
+function loadFromStorage<T>(key: string, fallback: T): T {
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? (JSON.parse(raw) as T) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function saveToStorage<T>(key: string, value: T): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // quota exceeded — silent fail
+  }
+}
+
 export function WarehouseProvider({ children }: { children: React.ReactNode }) {
-  const [warehouses, setWarehouses] = useState<Warehouse[]>(SEED_WAREHOUSES);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>(() =>
+    loadFromStorage("wms_warehouses", SEED_WAREHOUSES)
+  );
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>("wh-all");
   const [dashboardData, setDashboardData] = useState<DashboardData>(SCREENSHOT_DASHBOARD_DATA);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Admin Master State
-  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
-  const [users, setUsers] = useState<SystemUser[]>(INITIAL_USERS);
-  const [zones, setZones] = useState<Zone[]>(INITIAL_ZONES);
-  const [featureFlags, setFeatureFlags] = useState<FeatureFlags>(DEFAULT_FEATURE_FLAGS);
+  // Admin Master State — rehydrated from localStorage
+  const [categories, setCategories] = useState<Category[]>(() =>
+    loadFromStorage("wms_categories", INITIAL_CATEGORIES)
+  );
+  const [users, setUsers] = useState<SystemUser[]>(() =>
+    loadFromStorage("wms_users", INITIAL_USERS)
+  );
+  const [zones, setZones] = useState<Zone[]>(() =>
+    loadFromStorage("wms_zones", INITIAL_ZONES)
+  );
+  const [featureFlags, setFeatureFlags] = useState<FeatureFlags>(() =>
+    loadFromStorage("wms_featureFlags", DEFAULT_FEATURE_FLAGS)
+  );
+
+  // Persist admin state to localStorage whenever it changes
+  useEffect(() => { saveToStorage("wms_warehouses", warehouses); }, [warehouses]);
+  useEffect(() => { saveToStorage("wms_categories", categories); }, [categories]);
+  useEffect(() => { saveToStorage("wms_users", users); }, [users]);
+  useEffect(() => { saveToStorage("wms_zones", zones); }, [zones]);
+  useEffect(() => { saveToStorage("wms_featureFlags", featureFlags); }, [featureFlags]);
 
   const selectedWarehouse =
     warehouses.find((w) => w.id === selectedWarehouseId) || warehouses[0];
