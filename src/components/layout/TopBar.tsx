@@ -13,6 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useWarehouse } from "@/context/WarehouseContext";
+import { useAuth } from "@/context/AuthContext";
 import { cn } from "@/lib/utils";
 
 export function TopBar() {
@@ -23,6 +24,8 @@ export function TopBar() {
     setSelectedWarehouseId,
     setMobileMenuOpen,
   } = useWarehouse();
+
+  const { user, signOut } = useAuth();
 
   const [warehouseDropdownOpen, setWarehouseDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -148,15 +151,15 @@ export function TopBar() {
             <div className="flex items-center justify-center w-7 h-7 bg-[#111111] rounded-full text-white">
               <User className="w-4 h-4" />
             </div>
-            <span className="text-xs font-semibold text-[#111111]">Admin</span>
+            <span className="text-xs font-semibold text-[#111111]">{user?.name ?? "Admin"}</span>
             <ChevronDown className="w-3.5 h-3.5 text-[#6B7280]" />
           </button>
 
           {userDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white border border-[#EEF0F2] rounded-xl shadow-dropdown py-1.5 z-50">
               <div className="px-3 py-2 border-b border-[#EEF0F2]">
-                <p className="text-xs font-semibold text-[#111111]">Super Admin</p>
-                <p className="text-[11px] text-[#6B7280]">admin@wms.internal</p>
+                <p className="text-xs font-semibold text-[#111111]">{user?.name ?? "Admin"}</p>
+                <p className="text-[11px] text-[#6B7280]">{user?.email ?? ""}</p>
               </div>
               <div className="py-1">
                 <button
@@ -164,10 +167,13 @@ export function TopBar() {
                   className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-[#4B4B4B] hover:bg-gray-50"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Security & Roles</span>
+                  <span>Security &amp; Roles</span>
                 </button>
                 <button
-                  onClick={() => setUserDropdownOpen(false)}
+                  onClick={() => {
+                    setUserDropdownOpen(false);
+                    void signOut();
+                  }}
                   className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-[#DC2626] hover:bg-red-50"
                 >
                   <LogOut className="w-3.5 h-3.5" />
