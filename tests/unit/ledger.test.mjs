@@ -64,3 +64,4 @@ describe("Immutable Stock Ledger Invariants", () => {
     assert.equal(finalStock, 95);
   });
 });
+

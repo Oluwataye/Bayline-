@@ -34,17 +34,13 @@ import { formatNumber, formatCurrency } from "@/lib/utils";
 import { ProductModal, ProductFormData } from "@/components/inventory/ProductModal";
 import { useToast } from "@/components/ui/Toast";
 
-const CATEGORIES = [
-  { id: "all", name: "All Categories" },
-  { id: "cat-1", name: "Electronics" },
-  { id: "cat-2", name: "Furniture" },
-  { id: "cat-3", name: "Accessories" },
-  { id: "cat-4", name: "Others" },
-];
-
 export default function InventoryPage() {
-  const { selectedWarehouse } = useWarehouse();
+  const { selectedWarehouse, categories } = useWarehouse();
   const { addToast } = useToast();
+
+  const allCategories = useMemo(() => {
+    return [{ id: "all", name: "All Categories" }, ...categories];
+  }, [categories]);
 
   const [products, setProducts] = useState<Product[]>(SEED_PRODUCTS);
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -79,7 +75,7 @@ export default function InventoryPage() {
   // Handle Create or Update
   const handleSaveProduct = (data: ProductFormData) => {
     const warehouse = SEED_WAREHOUSES.find((w) => w.id === data.warehouseId);
-    const category = CATEGORIES.find((c) => c.id === data.categoryId);
+    const category = allCategories.find((c) => c.id === data.categoryId);
 
     let status: Product["status"] = "in_stock";
     if (data.currentStock === 0) {
@@ -465,7 +461,7 @@ export default function InventoryPage() {
 
         {/* Category Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pt-1">
-          {CATEGORIES.map((cat) => {
+          {allCategories.map((cat) => {
             const count =
               cat.id === "all"
                 ? warehouseProducts.length

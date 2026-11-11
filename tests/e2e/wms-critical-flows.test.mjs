@@ -149,3 +149,4 @@ describe("E2E Critical Flow Tests — Warehouse Dashboard WMS", () => {
     assert.ok(bodyText.includes("Dangote Industries"), "Client cards should render");
   });
 });
+

@@ -44,8 +44,14 @@ const OPERATIONS_NAV_ITEMS: NavItem[] = [
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { lastUpdated, mobileMenuOpen, setMobileMenuOpen } = useWarehouse();
+  const { lastUpdated, mobileMenuOpen, setMobileMenuOpen, featureFlags } = useWarehouse();
   const [operationsExpanded, setOperationsExpanded] = useState(true);
+
+  const activeOperationsItems = OPERATIONS_NAV_ITEMS.filter((item) => {
+    if (item.name === "Payroll" && !featureFlags.showPayrollModule) return false;
+    if (item.name === "CRM" && !featureFlags.showCrmModule) return false;
+    return true;
+  });
 
   const renderNavLinks = (items: NavItem[], isCompact = false) => {
     return (
@@ -132,11 +138,11 @@ export function Sidebar() {
                 />
               </button>
               {operationsExpanded && (
-                <div className="mt-1">{renderNavLinks(OPERATIONS_NAV_ITEMS, false)}</div>
+                <div className="mt-1">{renderNavLinks(activeOperationsItems, false)}</div>
               )}
             </div>
             <div className="xl:hidden">
-              {renderNavLinks(OPERATIONS_NAV_ITEMS, true)}
+              {renderNavLinks(activeOperationsItems, true)}
             </div>
           </div>
         </div>
@@ -183,7 +189,7 @@ export function Sidebar() {
                 <div className="px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#8A8A8A]">
                   Operations
                 </div>
-                <div className="mt-1">{renderNavLinks(OPERATIONS_NAV_ITEMS, false)}</div>
+                <div className="mt-1">{renderNavLinks(activeOperationsItems, false)}</div>
               </div>
             </div>
 

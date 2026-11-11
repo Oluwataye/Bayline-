@@ -7,13 +7,7 @@ import * as z from "zod";
 import { X, Package, AlertCircle } from "lucide-react";
 import { Product } from "@/types";
 import { SEED_WAREHOUSES } from "@/lib/seed-data";
-
-const CATEGORIES = [
-  { id: "cat-1", name: "Electronics" },
-  { id: "cat-2", name: "Furniture" },
-  { id: "cat-3", name: "Accessories" },
-  { id: "cat-4", name: "Others" },
-];
+import { useWarehouse } from "@/context/WarehouseContext";
 
 const UNITS = ["pcs", "kg", "litre", "bundle", "roll", "box", "pair"];
 
@@ -59,6 +53,17 @@ export function ProductModal({
   product,
 }: ProductModalProps) {
   const isEdit = Boolean(product);
+  const { categories } = useWarehouse();
+  // Fall back to built-in list only when context has no categories yet
+  const categoryList =
+    categories.length > 0
+      ? categories
+      : [
+          { id: "cat-1", name: "Electronics" },
+          { id: "cat-2", name: "Furniture" },
+          { id: "cat-3", name: "Accessories" },
+          { id: "cat-4", name: "Others" },
+        ];
 
   const {
     register,
@@ -109,7 +114,7 @@ export function ProductModal({
         sku: `SKU-${Date.now().toString().slice(-4)}`,
         barcode: `8934${Math.floor(1000000 + Math.random() * 9000000)}`,
         description: "",
-        categoryId: "cat-1",
+        categoryId: categoryList[0]?.id ?? "cat-1",
         unit: "pcs",
         costPrice: 5000,
         sellingPrice: 8500,
@@ -236,7 +241,7 @@ export function ProductModal({
                 {...register("categoryId")}
                 className="w-full px-3 py-2 text-xs border border-[#EEF0F2] rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-[#111111]/10 focus:border-[#111111]"
               >
-                {CATEGORIES.map((c) => (
+                {categoryList.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>

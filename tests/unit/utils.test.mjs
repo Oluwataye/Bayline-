@@ -33,3 +33,4 @@ describe("Utility Functions (Formatting & Localization)", () => {
     assert.ok(formatted.includes("140,000,000"));
   });
 });
+
