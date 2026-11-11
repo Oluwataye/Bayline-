@@ -190,8 +190,8 @@
 | Checkpoint | Scope | Status | Proof / Evidence |
 |------------|-------|--------|------------------|
 | **Checkpoint 1** | Plan Approval (`tasks/todo.md`) | ✅ Approved | Approved by user |
-| **Checkpoint 2** | Design System + Shell + Dashboard UI | ⏳ In Review | Screenshots at 1440px, 1024px, 390px captured & verified |
-| **Checkpoint 3** | Tenancy + Auth + RBAC + Audit | ⏹ Pending | Multi-warehouse isolation verification |
+| **Checkpoint 2** | Design System + Shell + Dashboard UI | ✅ Verified & Pushed | Pushed to https://github.com/Oluwataye/Bayline-.git (`fff9095`) |
+| **Checkpoint 3** | Tenancy + Auth + RBAC + Audit | ⏳ In Progress | Schema & seed files generated (`00001_initial_schema.sql`, `seed.sql`) |
 | **Checkpoint 4** | Inventory + Stock Movement + Alerts | ⏹ Pending | Ledger invariant & transfer state test logs |
 | **Checkpoint 5** | Reports + Payroll + CRM + Settings | ⏹ Pending | Payslip generation, CRM quotes & settings test logs |
 | **Checkpoint 6** | Final Delivery & Deployment Prep | ⏹ Pending | Type-check, lint, build & test suite passes |
